@@ -34,3 +34,12 @@ input.result{
     margin-right: 50px;
     float: right;
 }
+
+div.floaty-last{
+
+    position: absolute;
+    right: 50px;
+    z-index: 99;
+    top:10px;
+    color: #aaa;
+}

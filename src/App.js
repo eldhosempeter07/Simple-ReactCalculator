@@ -9,19 +9,45 @@ class App extends Component {
   
     this.state = {
       previous:[],
-      current:''   
+      current:'0',
+      nextIsReset:false
     }
   }
   reset=()=>{
     this.setState({
-      current:0
+      current:'0',
+      previous:[],
+      nextIsReset:false
     })
   }
   
+  calculate=()=>{
+    let{current,nextIsReset,previous}=this.state
+    if(previous.length>0){
+      current = eval(String(previous[previous.length-1]+current));
+    }
+    this.setState({previous:[],current,nextIsReset:true})
+
+  }
+  
   addToCurrent=(symbol)=>{
-    this.setState({
-      current:this.state.current+symbol
-    });
+    if(["/","*","-","+"].indexOf(symbol)>-1){
+      let{previous} = this.state;
+      previous.push(this.state.current+symbol);
+      this.setState({previous,nextIsReset:true})
+    }else{
+      if((this.state.current === "0" && symbol !== '.' )|| this.state.nextIsReset){
+        this.setState({
+        current:symbol,nextIsReset:false
+        })
+      }else{
+        this.setState({
+          current:this.state.current+symbol
+        });
+      }
+
+    }
+    
   }
 render(){
   const buttons=[
@@ -30,7 +56,7 @@ render(){
     {symbol:'7',cols:1,action:this.addToCurrent},
     {symbol:'8',cols:1,action:this.addToCurrent},
     {symbol:'9',cols:1,action:this.addToCurrent},
-    {symbol:'X',cols:1,action:this.addToCurrent},
+    {symbol:'*',cols:1,action:this.addToCurrent},
     {symbol:'4',cols:1,action:this.addToCurrent},
     {symbol:'5',cols:1,action:this.addToCurrent},
     {symbol:'6',cols:1,action:this.addToCurrent},
@@ -41,13 +67,17 @@ render(){
     {symbol:'+',cols:1,action:this.addToCurrent},
     {symbol:'0',cols:2,action:this.addToCurrent},
     {symbol:'.',cols:1,action:this.addToCurrent},
-    {symbol:'=',cols:1,action:this.addToCurrent},
+    {symbol:'=',cols:1,action:this.calculate},
   
   ]
   
   return (
     <div className='App'>
-      <input className='result' value={this.state.current}/>
+      {this.state.previous.length>0 ?
+        <div className='floaty-last'>{this.state.previous[this.state.previous.length-1]}</div>
+      :null
+      }
+      <input className='result' type='text' value={this.state.current}/>
       {buttons.map((button,i)=>{
         return<Buttons key={i} symbol={button.symbol} cols ={button.cols} action={(symbol)=>button.action(symbol)}/>
       })}
